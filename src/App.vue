@@ -106,26 +106,6 @@ export default {
 </script>
 
 <style scoped>
-@keyframes side-fade-content {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-}
-@keyframes side-show-content {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 .restart-enter-from {
   opacity: 0;
   transform: translateY(-30px);
@@ -157,5 +137,4 @@ export default {
 .quiz-leave-to {
   opacity: 0;
 }
-
 </style>
