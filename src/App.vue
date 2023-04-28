@@ -1,69 +1,42 @@
 <template>
-  <div class="container">
-    <div id="home" class="flex-center flex-column">
-      <h1>Quiz App</h1>
-      <a class="btn" href="/game.html">Play</a>
-      <a class="btn" href="/highscores.html">High Scores</a>
-    </div>
+  <div class="container" v-if="!quizStarted">
+    <the-starter @start-quiz="startQuiz"></the-starter>
   </div>
 
-  <div class="container" v-if="!quizEnded">
-    <div id="game" class="justify-center flex-column">
-      <h2 id="quesiton">{{ questions[round].question }}</h2>
-      <div ref="questionBox">
-        <div
-          class="choice-container"
-          v-for="(answer, index) in questions[round].options"
-          :key="answer"
-          @click="submitAnswer"
-          :class="
-            {
-              incorrect:
-                selectedAnswer &&
-                answer === selectedAnswer &&
-                answer !== questions[round].options[questions[round].correct],
-            },
-            {
-              correct:
-                selectedAnswer &&
-                answer === questions[round].options[questions[round].correct],
-            }
-          "
-        >
-          <p class="choice-prefix">{{ index + 1 }}</p>
-          <p class="choice-text">{{ answer }}</p>
-        </div>
-      </div>
-
-      <a
-        class="btn"
-        @click="nextQuestion"
-        v-if="selectedAnswer && round < count - 1"
-        >Next</a
-      >
-      <a
-        class="btn"
-        v-if="selectedAnswer && round === count - 1"
-        @click="showResults"
-        >Finish</a
-      >
-    </div>
+  <div class="container" v-if="!quizEnded && quizStarted">
+    <the-game
+      :questions="questions"
+      :round="round"
+      :count="count"
+      :setClass="disableClass ? 'disabledButton' : ''"
+      :selectedAnswer="selectedAnswer"
+      @show-results="showResults"
+      @next-question="nextQuestion"
+      @submit-answer="submitAnswer"
+    ></the-game>
   </div>
   <div class="container" v-if="quizEnded">
-    <div class="flex-center flex-column">
-      <h2>Quiz ended!</h2>
-      <h3>
-        Congratulation! You passed {{ correctAnswers }} of {{ count }} right!
-      </h3>
-      <a class="btn" v-if="quizEnded" @click="restartQuiz">Restart</a>
-    </div>
+    <the-end
+      :correctAnswers="correctAnswers"
+      :count="count"
+      @restart-quiz="restartQuiz"
+    ></the-end>
   </div>
 </template>
 
 <script>
+import TheEnd from "./components/TheEnd.vue";
+import TheGame from "./components/TheGame.vue";
+import TheStarter from "./components/TheStarter.vue";
 export default {
+  components: {
+    TheEnd,
+    TheGame,
+    TheStarter,
+  },
   data() {
     return {
+      quizStarted: false,
       quizEnded: false,
       selectedAnswer: "",
       round: 0,
@@ -100,16 +73,21 @@ export default {
       }
     },
   },
+  computed: {
+    disableClass() {
+      return this.selectedAnswer === "";
+    },
+  },
   methods: {
-    submitAnswer(e) {
-      const answer = e.currentTarget.lastElementChild.textContent;
+    startQuiz() {
+      this.quizStarted = true;
+    },
+    submitAnswer(answer) {
       this.selectedAnswer = answer;
-      this.$refs.questionBox.classList.add("disabledbutton");
     },
     nextQuestion() {
       this.round++;
       this.selectedAnswer = "";
-      this.$refs.questionBox.classList.remove("disabledbutton");
     },
     showResults() {
       this.quizEnded = true;
