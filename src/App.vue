@@ -2,7 +2,7 @@
   <div class="container" v-if="!quizStarted">
     <the-starter @start-quiz="startQuiz"></the-starter>
   </div>
-
+<transition name="quiz">
   <div class="container" v-if="!quizEnded && quizStarted">
     <the-game
       :questions="questions"
@@ -15,13 +15,16 @@
       @submit-answer="submitAnswer"
     ></the-game>
   </div>
-  <div class="container" v-if="quizEnded">
-    <the-end
-      :correctAnswers="correctAnswers"
-      :count="count"
-      @restart-quiz="restartQuiz"
-    ></the-end>
-  </div>
+</transition>
+  <transition name="restart">
+    <div class="container" v-if="quizEnded">
+      <the-end
+        :correctAnswers="correctAnswers"
+        :count="count"
+        @restart-quiz="restartQuiz"
+      ></the-end>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -103,16 +106,56 @@ export default {
 </script>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+@keyframes side-fade-content {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+@keyframes side-show-content {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.restart-enter-from {
+  opacity: 0;
+  transform: translateY(-30px);
 }
+.restart-enter-active {
+  transition: all 1s ease-out;
+}
+.restart-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.quiz-enter-from {
+  opacity: 0;
+}
+.quiz-enter-active {
+  transition: all 0.3s ease-out;
+}
+.quiz-enter-to {
+  opacity: 1;
+}
+
+.quiz-leave-from {
+  opacity: 1;
+}
+.quiz-leave-active {
+  transition: all 0.3s ease-in;
+}
+.quiz-leave-to {
+  opacity: 0;
+}
+
 </style>
